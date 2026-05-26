@@ -43,9 +43,34 @@ public class CourseController: ControllerBase
     //GET /api/courses/{idCourse}/assignments?publishedOnly=true Return assignments for one course.
     //Include submission count. Return 404 if the course does not exist.
     [HttpGet("{idCourse:int}/assignments")]
-    public async Task<IActionResult> GetAssignments([FromRoute] int idCourse)
+    public async Task<IActionResult> GetAssignments(int idCourse,[FromQuery] bool publishedOnly = false)
     {
-        
+        var assigments = await _dbContext.Assignments
+            .AsNoTracking()
+            .Include(s => s.Submissions)
+            .Where(a => a.CourseId == idCourse)
+            .Where(a => !publishedOnly || a.IsPublished)
+            .ToListAsync();
+
+        var course = await _dbContext.Courses.AsNoTracking()
+            .FirstOrDefaultAsync(a => a.CourseId == idCourse);
+
+        if (course == null)
+        {
+            return NotFound();
+        }
+
+        var result = assigments.Select(a => new AssignmentDto
+        {
+            assignmentId = a.AssignmentId,
+            title = a.Title,
+            dueDate = a.DueDate,
+            maxPoints = a.MaxPoints,
+            isPublished = a.IsPublished,
+            submissionCount = a.Submissions.Count
+        });
+
+        return Ok(result);
     }
     
 }
