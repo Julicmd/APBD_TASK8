@@ -8,5 +8,5 @@ public class SubmissionDto
     public string RepositoryUrl { get; set; }
     public string Status { get; set; }
     public decimal? Score { get; set; }
-    public string Feedback { get; set; }
+    public string? Feedback { get; set; }
 }
