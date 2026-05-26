@@ -1,6 +1,6 @@
 namespace UniversityTasksDbFirstApi.Controllers;
 
-public class CourseController
+public class CourseController: BaseC
 {
     
 }
